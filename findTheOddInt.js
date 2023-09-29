@@ -33,7 +33,7 @@ function findOdd(A) {
   let currentData = filterArray(A)
 
   while (searching) {
-    // test for completness:
+    // test for completion:
     if (currentData.isOddCount) {
       return currentData.elementRemoved
     }
