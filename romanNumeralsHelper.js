@@ -18,68 +18,107 @@ class RomanNumerals {
   static toRoman(num) {
     //check each number from left to right
     // convert digit to roman numeral
+
+    // Variable to build 
     let romanNumeral = ''
-    let currentValues = this.reduceNumber({current: 0, nextVal: num})
+    const numStr = num.toString()
+    let currentValues = this.reduceNumber({ current: 0, nextVal: numStr })
     const rn = ['M', 'D', 'C', 'L', 'X', 'V', 'I']
     let order = 0
-    while(currentValues.continue){
+    if (numStr.length === 1){
+      order = 6
+    } else if ( numStr.length === 2){
+      order = 4
+    } else if (numStr.length === 3){
+      order = 2
+    }
+
+    while(order < 7){
       const { current } = currentValues
-  
-      console.log('curr:', current) 
-      if (current === 0){
-        //number is zero
-        romanNumeral = romanNumeral
-      }
       // 1000's
       if(order === 0){
-        console.log('thousands column')
         romanNumeral += rn[0].repeat(current)
       } else {
         if(current<4){
-          console.log('less than 4')
           romanNumeral += rn[order].repeat(current)
+        } else if(current === 5){
+          romanNumeral += rn[order - 1]
         } else if(current === 4){
-          console.log('is 4')
-          romanNumeral += rn[order]
+          romanNumeral += `${rn[order]}${rn[order-1]}`
         } else if (current === 9){
-          console.log('is 9')
           romanNumeral += `${rn[order]}${rn[order-2]}`
+        } else if (current === 0){
+          //number is zero
+          romanNumeral = romanNumeral
         } else {
-          console.log('current will repeat', current-5)
           romanNumeral += `${rn[order-1]}${rn[order].repeat(current-5)}`
         }
       }
       order += 2
       currentValues = this.reduceNumber(currentValues)
-      console.log(romanNumeral)
     }
     return romanNumeral
   }
 
+  // get the next number and return the current cursor
   static reduceNumber(numObj){
     let strNum = numObj.nextVal.toString()
-    const current = parseInt(strNum[0])
-    const nextVal = parseInt(strNum.substring(1)) || 0
-
+    const current = parseInt(strNum[0]) || 0
+    const nextVal = strNum.substring(1)
     return { current, nextVal }
   }
 
-
   static fromRoman(str) {
-    return 4;
+    // total to return and current index of str
+    let total = 0
+    let count = 0
+    // lookup array of possible roman numerals
+    const rn = ['I', 'IV', 'V', 'IX', 'X', 'XL', 'L', 'XC', 'C', 'CD', 'D', 'CM', 'M']
+    // lookup index for value of roman numeral
+    const rnVal = [1,4,5,9,10,40,50,90,100,400,500,900,1000]
+    
+    //iterate over str
+    while(count < str.length){
+      // set one and two digit roman numerals to test against lookup array
+      let oneDigit = str[count]
+      let twoDigit = `${str[count]}${str[count + 1]}`
+      // initialze lookup index to be out of range
+      let idx = -1
+  
+      if(str.length -1 === count){
+        // If its the last digit only lookup against a single digit
+        idx = rn.findIndex(i => i === oneDigit)
+        total = total + rnVal[idx]
+        count++
+      } else {
+        // try double first
+        idx = rn.findIndex(i => i === twoDigit)
+        if (idx >= 0){
+          total = total + rnVal[idx]
+          count = count + 2
+        } else {
+          // lookup failed on double digit try single
+          idx = rn.findIndex(i => i === oneDigit)
+          total = total + rnVal[idx]
+          count = count + 1
+        }
+      }
+    }
+    return total
   }
 }
 
-/* console.log(RomanNumerals.toRoman(1000), 'M');
-console.log(RomanNumerals.toRoman(1111), 'M');
+console.log(RomanNumerals.toRoman(1000), 'M');
 console.log(RomanNumerals.toRoman(4), 'IV');
 console.log(RomanNumerals.toRoman(1), 'I');
 console.log(RomanNumerals.toRoman(1999), 'MCMXCIX');
-console.log(RomanNumerals.toRoman(1990), 'MCMXC'); */
+console.log(RomanNumerals.toRoman(1990), 'MCMXC'); 
 console.log(RomanNumerals.toRoman(2008), 'MMVIII');
-/*
+console.log(RomanNumerals.toRoman(530), 'DXXX');
+
 console.log(RomanNumerals.fromRoman('XXI'), 21);
 console.log(RomanNumerals.fromRoman('I'), 1);
 console.log(RomanNumerals.fromRoman('IV'), 4);
 console.log(RomanNumerals.fromRoman('MMVIII'), 2008);
-console.log(RomanNumerals.fromRoman('MDCLXVI'), 1666); */
+console.log(RomanNumerals.fromRoman('MDCLXVI'), 1666);
+console.log(RomanNumerals.fromRoman('DXXX'), 530);
